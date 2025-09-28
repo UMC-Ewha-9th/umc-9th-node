@@ -79,6 +79,8 @@
         user_mission ON user.id = user_mission.user_id AND user_mission.status = '성공' -- 사용자의 성공 미션 기록만 연결
     LEFT JOIN
         mission ON user_mission.mission_id = mission.id                              -- 성공 미션의 reward 정보 가져오기
+
+
     WHERE
         user.id = :user_id  -- 현재 로그인한 사용자 ID
     GROUP BY
