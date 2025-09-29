@@ -1,0 +1,28 @@
+{
+  "name": "25fall_umc",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "UMC practice 03 test project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon --exec node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saigepole/25fall_umc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saigepole/25fall_umc/issues"
+  },
+  "homepage": "https://github.com/saigepole/25fall_umc#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
