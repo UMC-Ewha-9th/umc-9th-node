@@ -1,4 +1,4 @@
--- 미션 모아서 보기
+-- 미션 모아보기
 SELECT
     mm.status,
     m.reward,
