@@ -1,0 +1,102 @@
+-- 1. 미션 모아보기
+-- 진행중 
+SELECT 
+    mm.id AS cursor_id, 
+    mm.status,
+    s.name AS store_name,
+    m.reward,
+    m.mission_detail
+FROM my_mission mm
+JOIN mission m ON mm.mission_id = m.id
+JOIN store s ON mm.store_id = s.id
+WHERE mm.member_id = ? 
+    AND mm.status = 'IN_PROGRESS'
+    AND mm.id < ? 
+ORDER BY mm.id DESC
+LIMIT 3; 
+
+-- 진행 완료
+SELECT 
+    mm.id AS cursor_id, -- 페이징용 (화면에는 표시 안 함)
+    mm.status,
+    s.name AS store_name,
+    m.reward,
+    m.mission_detail
+FROM my_mission mm
+JOIN mission m ON mm.mission_id = m.id
+JOIN store s ON mm.store_id = s.id
+WHERE mm.member_id = ? -- 회원 ID
+    AND mm.status = 'SUCCESS'
+    AND mm.id < ? -- cursor
+ORDER BY mm.id DESC
+LIMIT 3;
+
+
+-- 2. 리뷰 작성하기 
+START TRANSACTION;
+-- 리뷰 등록
+INSERT INTO review (store_id, member_id, score, contents, created_at, updated_at)
+VALUES (?, ?, ?, ?, NOW(6), NOW(6));
+-- 가게 평점 업데이트
+UPDATE store 
+SET score = (
+    SELECT AVG(score) 
+    FROM review 
+    WHERE store_id = ?
+),
+updated_at = NOW(6)
+WHERE id = ?;
+-- 작동 확인 
+SELECT ROW_COUNT() AS affected_rows;
+COMMIT;
+
+
+-- 3. 미션 목록 
+SELECT 
+    m.id AS mission_id,
+    s.name AS store_name,
+    r.name AS region_name,
+    m.reward,
+    m.mission_detail,
+    m.d_day,
+    s.score AS store_score,
+    EXISTS(
+        SELECT 1 
+        FROM my_mission mm 
+        WHERE mm.mission_id = m.id 
+            AND mm.member_id = ?
+            AND mm.status IN ('PENDING', 'IN_PROGRESS')
+    ) AS is_challenged
+FROM mission m
+JOIN store s ON m.store_id = s.id
+JOIN region r ON m.region_id = r.id
+WHERE m.region_id = ? -- 선택한 지역 ID
+    AND s.is_open = TRUE
+    AND (m.d_day IS NULL OR m.d_day > NOW())
+    AND m.id < ? -- cursor
+ORDER BY m.id DESC
+LIMIT 3; 
+
+
+-- 4. 마이 페이지 
+SELECT 
+    nickname,
+    email,
+    phone_num,
+    point,
+    created_at
+FROM member
+WHERE id = ?
+    AND is_active = TRUE;
+-- 작성 리뷰
+SELECT 
+    r.id,
+    r.score,
+    r.contents,
+    r.created_at,
+    s.name AS store_name
+FROM review r
+JOIN store s ON r.store_id = s.id
+WHERE r.member_id = ?
+ORDER BY r.created_at DESC
+LIMIT 5;

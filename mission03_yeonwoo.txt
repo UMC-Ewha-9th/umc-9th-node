@@ -1,0 +1,87 @@
+POST /api/v1/member/signup
+Content_Type : application/json
+{
+    "name":김연우;,
+    "gender":F;,
+    "birthdate":20040110;,
+    "address":서대문구;,
+    "prefer_food":[1];
+
+}
+<Response>
+{
+    "memberId":1,
+    "name":김연우;
+}
+
+
+
+GET /api/v1/home/{memberId}
+{
+  "Authorization": "Bearer {accessToken}"
+}
+
+{
+  "progressMissionCount": 7,
+  "targetMissionCount": 10,
+  "rewardOnComplete": 1000,
+  "myMission": [
+    {
+      "missionId": 12,
+      "storeName": "반이학생마라탕",
+      "reward": 500,
+      "dDay": "D-7",
+      "missionDetail": "..."; 
+      "status": "IN_PROGRESS"
+    }
+  ]
+}
+
+
+GET /api/v1/missions/{memberId}
+{
+  "Authorization": "Bearer {accessToken}"
+}
+[
+ {
+      "missionId": 12,
+      "storeName": "반이학생마라탕",
+      "reward": 500,
+      "dDay": "D-7",
+      "missionDetail": "..."; 
+      "status": "IN_PROGRESS"
+    }
+]
+
+
+POST /api/v1/missions/{myMissionId}/successRequest
+{
+  "Authorization": "Bearer {accessToken}",
+  "Content-Type": "application/json"
+}
+{
+  "authCode": "920394810"
+}
+{
+  "missionId": 3,
+  "status": "completed",
+  "rewardGranted": true,
+  "rewardDetail": "500P"
+}
+
+POST /api/v1/reviews/{myMissionId}
+{
+  "Authorization": "Bearer {accessToken}",
+  "Content-Type": "application/json"
+}
+{
+  "score": 4,
+  "content": "..."
+}
+{
+  "reviewId": 10,
+  "missionId": 3,
+  "score": 4,
+  "content": "...",
+  "createdAt": "2025-09-29 00:00:00"
+}
