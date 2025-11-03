@@ -15,11 +15,12 @@ export const addUser = async (data) => {
     }
 
     const [result] = await pool.query(
-      `INSERT INTO user (email, name, nickname, gender, birth, address, phone_num) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+      `INSERT INTO user (email, name, nickname, password, gender, birth, address, phone_num) VALUES (?, ?, ?, ?, ?, ?, ?);`,
       [
         data.email,
         data.name,
         data.nickname,
+        data.password, //해싱된 비밀번호 
         data.gender,
         data.birth,
         data.address,
@@ -79,6 +80,30 @@ export const setPreference = async (userId, foodCategoryId) => {
     conn.release();
   }
 };
+//로그인용 사용자 조회
+export const getUserByEmail = async (email) => {
+  const conn = await pool.getConnection();
+
+  try {
+    const [users] = await pool.query(
+      `SELECT * FROM user WHERE email = ?;`, 
+      [email]
+    );
+
+    if (users.length === 0) {
+      return null;
+    }
+
+    return users[0];
+  } catch (err) {
+    throw new Error(
+      `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err})`
+    );
+  } finally {
+    conn.release();
+  }
+};
+
 
 // 사용자 선호 카테고리 반환
 export const getUserPreferencesByUserId = async (userId) => {
