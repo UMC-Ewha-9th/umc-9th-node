@@ -34,6 +34,21 @@ app.post("/api/v1/stores/addStore", (req, res) => {
     });
 });
 
+// reviews 엔드포인트 추가
+app.post("/api/v1/stores/addReview", (req, res) => {
+    const { storeId, userId, score, contents } = req.body;
+    
+    // 여기에 스토어 추가 로직 구현
+    console.log("받은 데이터:", req.body);
+    
+    res.status(200).json({
+        success: true,
+        message: "Review added successfully",
+        data: req.body
+    });
+});
+
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)  // 백틱과 ${} 사용
 })
