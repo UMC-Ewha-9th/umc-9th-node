@@ -8,7 +8,7 @@ export const handleAddReview = async (req, res, next) => { //회원가입 요청
     console.log("가게에 리뷰 추가!"); //controller는 비동기(async,await)
     console.log("body:", req.body); // 값이 잘 들어오나 확인하기 위한 테스트용, req : HTTP요청 데이터, req.body:회원가입 데이터 
 
-    const store = await addStore(bodyToReview(req.body)); //body를 dto로 변환. --> service 호출 
+    const review = await addReview(bodyToReview(req.body)); //body를 dto로 변환. --> service 호출 
 
       // 성공 응답
     res.status(StatusCodes.CREATED).json({ 
