@@ -1,4 +1,14 @@
 // 요청 body를 MyMission 객체로 변환
+export const bodyToMission = (body) => {
+  return {
+    storeId: body.storeId,
+    regionId: body.regionId,
+    reward: body.reward,
+    dDay: body.dDay,
+    missionDetail: body.missionDetail
+  };
+};
+
 export const bodyToMyMission = (body) => {
   return {
     userId: body.userId,

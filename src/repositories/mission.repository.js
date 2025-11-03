@@ -41,20 +41,21 @@ export const checkUserExists = async(userId) => {
 /////////////////////////////////////////////
 //미션 조회 (mission_id)
 export const getMission = async(missionId) => {
-    const conn = await pool.getConnection();
-
-    try{
-        const [missions] = await conn.query(
-            'SELECT id FROM mission WHERE id =?',
-            [missionId]
-        );
-        return missions.length>0;
-    } catch(err){
-        throw new Error('미션 조회 실패: ${err.message}');
-    } finally{
-        conn.release();
+  const conn = await pool.getConnection();
+  try{
+    const [missions] = await conn.query(
+      'SELECT * FROM mission WHERE id = ?',  // 모든 컬럼 가져오기
+      [missionId]
+    );
+    if (missions.length === 0) {
+      return null;
     }
-
+    return missions[0];  // 미션 객체 반환
+  } catch(err){
+    throw new Error(`미션 조회 실패: ${err.message}`);
+  } finally{
+    conn.release();
+  }
 };
 
 /////////////////////////////////////////////
