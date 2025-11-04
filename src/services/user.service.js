@@ -5,7 +5,7 @@ import {
   getUserPreferencesByUserId,
   setPreference,
 } from "../repositories/user.repository.js";
-
+import bcrypt from "bcrypt";
 export const userSignUp = async (data) => {
   const hashedPassword = await bcrypt.hash(data.password, 10);
 

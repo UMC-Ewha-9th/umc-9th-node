@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -15,36 +14,189 @@ datasource db {
 }
 
 
+model Terms {
+  id             BigInt     @id @default(autoincrement())
+  privacyAgree   Boolean    @map("privacy_agree")
+  locationAgree  Boolean    @map("location_agree")
+  marketingAgree Boolean    @map("marketing_agree")
+  termsAgree     Boolean    @map("terms_agree")
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  Agree          Agree[]
+  
+  @@map("terms")
+}
+
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique(map: "email") @db.VarChar(100)
-  name          String   @db.VarChar(20)
-  gender        String   @db.VarChar(15)
-  birth         DateTime @db.Date
-  address       String   @db.VarChar(100)
-  phoneNumber   String   @map("phone_num") @db.Char(11)
-  userFavorCategories PreferFood[]
-  @@map("user")
+  id          BigInt         @id @default(autoincrement())
+  name        String         @db.VarChar(20)
+  nickname    String         @db.VarChar(20)
+  password String @db.VarChar(100)
+  gender      Gender
+  birth       DateTime?      @db.Date
+  address     String?        @db.VarChar(100)
+  email       String         @unique @db.VarChar(100)
+  phoneNum    String?        @map("phone_num") @db.Char(11)  // 이 부분 수정!
+  isActive    Boolean        @map("is_active") @default(true)  // 이것도 수정
+  point       Int            @default(0)
+  createdAt   DateTime       @map("created_at") @default(now())  // 이것도 수정
+  updatedAt   DateTime       @map("updated_at") @updatedAt  // 이것도 수정
+
+  Agree        Agree[]
+  PreferFood   PreferFood[]
+  MyMission    MyMission[]
+  Review       Review[]
+
+}
+
+model Agree {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  termsId   BigInt   @map("terms_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  User  User  @relation(fields: [userId], references: [id])
+  Terms Terms @relation(fields: [termsId], references: [id])
+  
+  @@map("agree")
 }
 
 model FoodCategory {
-  id   Int    @id @default(autoincrement())
-  name String @db.VarChar(20)
+  id        BigInt       @id @default(autoincrement())
+  name      String       @db.VarChar(20)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
 
-  userFavorCategories PreferFood[]
-
+  PreferFood PreferFood[]
+  
   @@map("food_category")
 }
 
 model PreferFood {
-  id             Int          @id @default(autoincrement())
-  user           User         @relation(fields: [userId], references: [id])
-  userId         Int          @map("user_id")
-  foodCategory   FoodCategory @relation(fields: [foodCategoryId], references: [id])
-  foodCategoryId Int          @map("food_category_id")
+  id             BigInt       @id @default(autoincrement())
+  userId         BigInt       @map("user_id")          // 추가!
+  foodCategoryId BigInt       @map("food_category_id") // 추가!
+  createdAt      DateTime     @default(now()) @map("created_at")  // 추가!
+  updatedAt      DateTime     @updatedAt @map("updated_at")       // 추가!
 
-  @@index([foodCategoryId], map: "f_category_id")
-  @@index([userId], map: "user_id")
+  User         User         @relation(fields: [userId], references: [id])
+  FoodCategory FoodCategory @relation(fields: [foodCategoryId], references: [id])
+  
   @@map("prefer_food")
-} 
-//파일 수정 후에 npm exec prisma generate를 한번씩 돌리자. 
+}
+
+model Region {
+  id        BigInt     @id @default(autoincrement())
+  name      String     @db.VarChar(20)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Store     Store[]
+  Mission   Mission[]
+  MyMission MyMission[]
+}
+
+model StoreCategory {
+  id        BigInt     @id @default(autoincrement())
+  name      String     @db.VarChar(20)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Store     Store[]
+  @@map("store_category")
+}
+
+model Store {
+  id              BigInt        @id @default(autoincrement())
+  regionId        BigInt
+  storeCategoryId BigInt
+  name            String        @db.VarChar(20)
+  address         String        @db.VarChar(100)
+  isOpen          Boolean       @default(true)
+  score           Float         @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  Region         Region         @relation(fields: [regionId], references: [id])
+  StoreCategory  StoreCategory  @relation(fields: [storeCategoryId], references: [id])
+  Mission        Mission[]
+  MyMission      MyMission[]
+  Review         Review[]
+}
+
+model Mission {
+  id            BigInt     @id @default(autoincrement())
+  storeId       BigInt
+  regionId      BigInt
+  reward        Int
+  dDay          DateTime?
+  missionDetail String?    @db.VarChar(100)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  Store      Store      @relation(fields: [storeId], references: [id])
+  Region     Region     @relation(fields: [regionId], references: [id])
+  MyMission  MyMission[]
+}
+
+model MyMission {
+  id            BigInt     @id @default(autoincrement())
+  userId        BigInt
+  missionId     BigInt
+  storeId       BigInt
+  regionId      BigInt
+  status        MissionStatus
+  missionCount  Int         @default(0)
+  missionDetail String?     @db.VarChar(200)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  startedAt     DateTime?
+  completedAt   DateTime?
+
+  User     User     @relation(fields: [userId], references: [id])
+  Mission  Mission  @relation(fields: [missionId], references: [id])
+  Store    Store    @relation(fields: [storeId], references: [id])
+  Region   Region   @relation(fields: [regionId], references: [id])
+
+  @@map("my_mission")
+}
+
+model Review {
+  id        BigInt     @id @default(autoincrement())
+  storeId   BigInt
+  userId    BigInt
+  score     Float
+  contents  String?    @db.VarChar(200)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  Store        Store        @relation(fields: [storeId], references: [id])
+  User         User         @relation(fields: [userId], references: [id])
+  ReviewImages ReviewImages[]
+}
+
+model ReviewImages {
+  id        BigInt    @id @default(autoincrement())
+  reviewId  BigInt
+  imageUrl  String    @db.VarChar(300)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  Review Review @relation(fields: [reviewId], references: [id])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MissionStatus {
+  PENDING
+  IN_PROGRESS
+  SUCCESS
+  FAILED
+  CANCELLED
+}

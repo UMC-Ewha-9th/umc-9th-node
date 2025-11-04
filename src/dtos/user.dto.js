@@ -15,8 +15,17 @@ export const bodyToUser = (body) => {
 };
 
 
-
-export const responseFromUser = (user, preferences) => {
+export const responseFromUser = ({ user, preferences }) => {
+  const preferFoods = preferences.map(
+    (preference) => preference.FoodCategory.name  // FoodCategory로 수정 (대문자 F)
+  );
+  return {
+    email: user.email,
+    name: user.name,
+    preferCategory: preferFoods,
+  };
+};
+/*export const responseFromUser = (user, preferences) => {
   return {
     email: user.email,
     name: user.name,
@@ -28,4 +37,4 @@ export const responseFromUser = (user, preferences) => {
     preferences: preferences || []
     //password는 응답에서 제외.
   };
-};
+};*/
