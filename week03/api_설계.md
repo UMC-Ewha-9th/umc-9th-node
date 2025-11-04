@@ -5,14 +5,14 @@
 - **Endpoint**: `/api/v1/users`
 - **Request Body**:
     
-    ```json
+```json
     {
       "name": "함하경",
       "gender": "FEMALE",
       "birth_date": "2001-06-21",
       "address": "서울시 마포구",
     }
-    ```
+```
     
 ### 2. 선호 카테고리 조사
     
@@ -21,11 +21,11 @@
 - **Path Variable**: `userId`
 - **Request Body**:
     
-    ```json
+```json
     {
       "food_category_ids": [1, 2, 4]
     }
-    ```
+```
     
 ### 3. 홈 화면 – 도전 가능한 미션 조회
     
@@ -34,7 +34,7 @@
 - **Query String**: `?region=안암동&category=중식`
 - **Response 예시**:
     
-    ```json
+ ```json
     [
       {
         "mission_id": 11,
