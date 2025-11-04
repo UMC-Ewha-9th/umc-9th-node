@@ -5,6 +5,7 @@ export const bodyToUser = (body) => {
     email: body.email, //필수 
     name: body.name, // 필수
     nickname: body.nickname,
+    password: body.password,
     gender: body.gender, // 필수
     birth, // 필수
     address: body.address || "", //선택 
@@ -25,5 +26,6 @@ export const responseFromUser = (user, preferences) => {
     address: user.address,
     phoneNumber: user.phoneNumber || user.phone_number,
     preferences: preferences || []
+    //password는 응답에서 제외.
   };
 };
