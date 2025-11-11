@@ -1,11 +1,16 @@
-import { responseFromUser } from "../dtos/user.dto.js";
+import { responseFromReviews, responseFromUser, responseFromMyMissions } from "../dtos/user.dto.js";
 import {
   addUser,
   getUser,
   getUserPreferencesByUserId,
   setPreference,
+  getAllUserReviews,
+  getAllUserMissions
 } from "../repositories/user.repository.js";
+
 import bcrypt from "bcrypt";
+import { getUserByEmail } from "../repositories/user.repository.js";  // ⚠️ 이거도 추가!
+
 export const userSignUp = async (data) => {
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -52,4 +57,16 @@ export const userLogin = async (email, password) => {
   
   // 3. 로그인 성공 처리
   return responseFromUser({ user, preferences: [] });
+};
+
+//내가 작성한 모든 리뷰 조회 
+export const listUserReviews = async (userId, cursor) => {
+  const reviews = await getAllUserReviews(userId, cursor);
+  return responseFromReviews(reviews);
+};
+
+//내가 진행 중인 모든 미션 조회 
+export const listUserMissions = async (userId, cursor) => {
+  const missions = await getAllUserMissions(userId, cursor);
+  return responseFromMyMissions(missions);
 };

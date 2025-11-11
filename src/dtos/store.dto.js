@@ -22,7 +22,7 @@ export const responseFromStore = (store) => {
   };
 };
 
-//
+//가게에 대한 모든 리뷰 조회 
 export const responseFromReviews = (reviews) => {
   return {
     data: reviews,
@@ -31,3 +31,13 @@ export const responseFromReviews = (reviews) => {
     },
   };
 };
+//가게의 모든 미션 조회 
+export const responseFromMissions = (missions) => {
+  return {
+    data: missions,
+    pagination: {
+      cursor: missions.length ? missions[missions.length - 1].id : null,
+    },
+  };
+};
+

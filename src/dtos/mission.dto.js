@@ -29,6 +29,24 @@ export const responseFromMission = (mission) => {
   };
 };
 
+export const responseFromMissions = (missions) => {
+  return {
+    data: missions.map(mission => ({
+      id: mission.id.toString(),
+      storeId: mission.storeId,
+      regionId: mission.regionId,
+      reward: mission.reward,
+      dDay: mission.dDay,
+      missionDetail: mission.missionDetail,
+      createdAt: mission.createdAt
+    })),
+    pagination: {
+      cursor: missions.length ? missions[missions.length - 1].id.toString() : null
+    }
+  };
+};
+
+
 // DB 결과를 응답 형태로 변환 (MyMission)
 export const responseFromMyMission = (myMission) => {
   return {
@@ -44,3 +62,24 @@ export const responseFromMyMission = (myMission) => {
     startedAt: myMission.started_at
   };
 };
+// DB 결과를 응답 형태로 변환 (MyMission)
+export const responseFromMyMissions = (myMissions) => {
+  return {
+    data: myMissions.map(mission => ({
+      id: myMission.id.toString(),
+      userId: myMission.user_id,
+      missionId: myMission.mission_id,
+      storeId: myMission.store_id,
+      regionId: myMission.region_id,
+      status: myMission.status,
+      missionCount: myMission.mission_count,
+      missionDetail: myMission.mission_detail,
+      createdAt: myMission.created_at,
+      startedAt: myMission.started_at
+    })),
+    pagination: {
+      cursor: missions.length ? myMissions[myMissions.length - 1].id.toString() : null
+    }
+  };
+};
+

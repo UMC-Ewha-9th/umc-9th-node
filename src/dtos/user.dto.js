@@ -38,3 +38,23 @@ export const responseFromUser = ({ user, preferences }) => {
     //password는 응답에서 제외.
   };
 };*/
+
+//내가 쓴 리뷰 조회
+export const responseFromReviews = (reviews) => {
+  return {
+    data: reviews,
+    pagination: {
+      cursor: reviews.length ? reviews[reviews.length - 1].id : null,
+    },
+  };
+};
+//내가 진행중인 미션 조회 
+export const responseFromMyMissions = (missions) => {
+  return {
+    data: missions,
+    pagination: {
+      cursor: missions.length ? missions[missions.length - 1].id : null,
+    },
+  };
+};
+
