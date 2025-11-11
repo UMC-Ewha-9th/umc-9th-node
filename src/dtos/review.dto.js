@@ -19,3 +19,11 @@ export const responseFromReview = (review) => {
     createdAt: review.created_at
   };
 };
+
+// 여러 리뷰를 응답 형태로 변환 (복수) - 이거 추가!
+export const responseFromReviews = (reviews) => {
+  return {
+    data: reviews.map(review => responseFromReview(review)),
+    cursor: reviews.length > 0 ? reviews[reviews.length - 1].id : null
+  };
+};

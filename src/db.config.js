@@ -1,12 +1,14 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
-
 dotenv.config();
-
 import { PrismaClient } from "@prisma/client";
+
 
 export const prisma = new PrismaClient();
 
+console.log('=== db.config.js 로드됨 ===');
+console.log('prisma 생성됨:', prisma);
+console.log('prisma type:', typeof prisma);
 
 export const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost", // mysql의 hostname

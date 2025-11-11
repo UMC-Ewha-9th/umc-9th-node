@@ -1,5 +1,6 @@
-import { addStore as addStoreRepo, getStore } from "../repositories/store.repository.js";
+import { addStore as addStoreRepo, getAllStoreReviews, getStore } from "../repositories/store.repository.js";
 import { responseFromStore } from "../dtos/store.dto.js";
+import { responseFromReviews } from "../dtos/review.dto.js";
 
 // 가게 추가 비즈니스 로직
 export const addStore = async (data) => {
@@ -16,4 +17,10 @@ export const addStore = async (data) => {
   
   // 4. DTO로 변환하여 반환
   return responseFromStore(store);
+};
+
+//가게에 속한 모든 리뷰 조회 
+export const listStoreReviews = async (storeId, cursor) => {
+  const reviews = await getAllStoreReviews(storeId, cursor);
+  return responseFromReviews(reviews);
 };

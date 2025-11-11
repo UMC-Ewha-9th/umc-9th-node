@@ -165,12 +165,12 @@ model MyMission {
 
 model Review {
   id        BigInt     @id @default(autoincrement())
-  storeId   BigInt
-  userId    BigInt
+  storeId   BigInt     @map("store_id")
+  userId    BigInt     @map("user_id")
   score     Float
   contents  String?    @db.VarChar(200)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
 
   Store        Store        @relation(fields: [storeId], references: [id])
   User         User         @relation(fields: [userId], references: [id])

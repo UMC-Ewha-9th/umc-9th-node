@@ -1,4 +1,12 @@
-import { pool } from "../db.config.js";
+import { pool, prisma } from "../db.config.js";
+// 예시
+export const getReview = async (storeId, query) => {
+    return previewReviewResponseDTO(await getPreviewReview(reviewId, size, storeId));
+}
+
+export const previewReviewResponseDTO = (data) => {
+    return {"reviewData": null, "cursorId": null};
+}
 
 //////////////////////외래키 검증 함수////////////////////////////////
 
@@ -115,4 +123,51 @@ export const checkStoreExists =async(storeId) =>{
     } finally{
         conn.release();
     }
+};
+
+///////////////////////////////////////////////////
+//가게에 속한 모든 리뷰 조회 
+export const getAllStoreReviews = async (storeId, cursor=0) => {
+
+  console.log('📥 storeId:', storeId, typeof storeId);
+  console.log('📥 cursor:', cursor, typeof cursor);
+  console.log('📥 cursor is falsy?', !cursor);
+  
+  const whereCondition = { 
+    storeId: storeId,
+    ...(cursor ? { id: { gt: cursor } } : {})
+  };
+  
+  console.log('🔍 Final where:', JSON.stringify(whereCondition, null, 2));
+
+  const reviews = await prisma.review.findMany({
+    select: { 
+      id: true, 
+      contents: true, 
+      score: true, 
+      createdAt: true,
+      Store: {
+        select: {
+          id: true,
+          name: true
+        }
+      }, 
+      User: {
+        select: {
+          id: true,
+          name: true,
+          email: true
+        }
+      }
+    },
+    where: { 
+      storeId: storeId,
+      ...(cursor ? { id: { gt: cursor } } : {})  // ✅ cursor가 있을 때만 조건 추가
+    },
+    orderBy: { id: "asc" },
+    take: 5,
+  });
+  console.log('Returned IDs:', reviews.map(r => r.id));
+  
+  return reviews;
 };
