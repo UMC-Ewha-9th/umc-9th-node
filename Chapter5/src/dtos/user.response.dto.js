@@ -8,27 +8,29 @@
  * @param {Array<string>} data.preferences - 사용자의 선호 카테고리 리스트
  * @returns {object} 클라이언트에게 전달할 최종 사용자 응답 DTO
  */
-export const responseFromUser = (data) => {
-    // 인자로 받은 객체에서 user와 preferences를 구조 분해 할당
-    const { user: userData, preferences: preferenceList } = data; 
-    
-    // 이제 userData와 preferenceList 변수를 사용하여 로직을 처리합니다.
+
+export const responseFromUser = ({ user, preferences }) => {
+    // preferences 배열에서 각 항목의 category.name (카테고리 이름)만 추출합니다.
+    const preferFoods = preferences.map(
+        (preference) => preference.category.name 
+    );
 
     return {
-        // 필수 사용자 정보
-        // userData는 user.service.js에서 getUser(joinUserId)의 결과입니다.
-        userId: userData.id, 
-        email: userData.email,
-        name: userData.name,
-        gender: userData.gender,
-        birth: userData.birth,
-        phoneNumber: userData.phoneNumber,
+        // --- 필수 사용자 정보 ---
+        // user 객체에서 직접 접근
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        gender: user.gender,
+        birth: new Date(data.birth),
+        phoneNumber: user.phoneNumber,
 
-        // 선택 정보 (있는 경우에만 포함)
-        address: userData.address || null, 
-        detailAddress: userData.detailAddress || null,
+        // --- 선택 정보 (DB에 NULL 허용 필드) ---
+        // Prisma에서 null로 가져온 경우에도 명시적으로 포함 (없으면 null)
+        address: user.address || null,
+        detailAddress: user.detailAddress || null,
 
-        // 선호 카테고리 리스트
-        preferences: preferenceList,
+        // --- 선호 카테고리 리스트 ---
+        preferCategory: preferFoods, // 필드 이름 통일
     };
 };

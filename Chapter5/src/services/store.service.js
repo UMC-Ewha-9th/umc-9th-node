@@ -1,5 +1,6 @@
-import { addStore, getStoreById, addReview, addMission } from "../repositories_new/store.repository.js";
+import { addStore, getStoreById, addReview, addMission, getAllStoreReviews } from "../repositories_new/store.repository.js";
 import { checkMissionChallenge, insertMissionAttempt } from "../repositories_new/mission.repository.js";
+import { responseFromReviews } from "../dtos/review.dto.js"
 
 // 가게 등록 비즈니스 로직
 export const storeRegister = async (data) => {
@@ -84,4 +85,24 @@ export const challengeMission = async (userId, missionId) => {
 
     // 3. 성공적으로 삽입된 ID 반환
     return { attemptId };
+};
+
+/**
+ * 특정 가게의 리뷰 목록을 조회하는 비즈니스 로직 (페이지네이션 미적용 초기 버전)
+ * @param {number} storeId - 가게 ID
+ * @returns {Array<object>} - 리뷰 응답 DTO 배열
+ */
+export const listStoreReviews = async (storeId) => {
+    // 1. [핵심 검증] 가게 존재 여부 확인
+    const store = await getStoreById(storeId);
+    if (!store) {
+        // S404: Not Found - 가게가 없으면 리뷰도 조회 불가
+        throw new Error("S404: 해당 가게를 찾을 수 없습니다."); 
+    }
+    
+    // 2. Repository 호출: 모든 리뷰 목록 조회 (페이지네이션 미적용)
+    const reviews = await getAllStoreReviews(storeId);
+
+    // 3. 응답 DTO 변환 및 반환
+    return responseFromReviews(reviews);
 };

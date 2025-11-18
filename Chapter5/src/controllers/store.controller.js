@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { bodyToStore } from "../dtos/store.dto.js";
 import { bodyToReview } from "../dtos/review.dto.js";
 import { bodyToMission } from "../dtos/mission.dto.js";
-import { storeRegister, registerReview, registerMission, challengeMission } from "../services/store.service.js";
+import { storeRegister, registerReview, registerMission, challengeMission, listStoreReviews } from "../services/store.service.js";
 
 export const handleStoreRegister = async (req, res, next) => {
   try {
@@ -117,6 +117,62 @@ export const handleMissionChallenge = async (req, res, next) => {
         // Service에서 발생시킨 에러 코드(M409 등)를 처리
         // 예를 들어, 'M409:'로 시작하면 409 Conflict로 처리하도록 전역 에러 핸들러 설정 필요
         // 현재는 next()로 전달하여 기본 에러 핸들러에 맡김
+        next(error);
+    }
+};
+
+/**
+ * 특정 가게의 리뷰 목록 조회 핸들러 (커서 기반 페이지네이션 파라미터 처리)
+ * GET /api/v1/stores/:storeId/reviews?cursor={...}&size={...}
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.NextFunction} next
+ */
+export const handleListStoreReviews = async (req, res, next) => {
+    try {
+        // 1. Path Variable에서 storeId 추출 및 유효성 검사
+        const storeId = parseInt(req.params.storeId);
+
+        if (isNaN(storeId) || storeId <= 0) {
+            throw new Error("B400: 유효하지 않은 가게 ID입니다.");
+        }
+
+        // 2. Query Parameter에서 cursor와 size 추출 및 유효성 검사
+        // cursor: 다음 페이지의 시작점이 되는 마지막 리뷰의 ID (옵션)
+        // 값이 없거나 유효하지 않으면 null (첫 페이지)로 처리합니다.
+        const cursor = req.query.cursor ? parseInt(req.query.cursor) : null;
+        
+        // size: 한 페이지당 가져올 리뷰 개수 (기본값 10, 최대값 30)
+        let size = req.query.size ? parseInt(req.query.size) : 10;
+        
+        // size 유효성 검사 (숫자가 아니거나 1 미만인 경우)
+        if (isNaN(size) || size < 1) {
+            size = 10; // 유효하지 않으면 기본값으로 설정
+        }
+
+        // size 최대값 제한
+        const MAX_SIZE = 30;
+        if (size > MAX_SIZE) {
+            size = MAX_SIZE;
+        }
+
+        // 3. Service 로직 호출 (커서 기반 페이지네이션 적용)
+        // Service는 { reviews: Array, nextCursor: number | null } 형태의 응답을 반환합니다.
+        const { reviews, nextCursor } = await listStoreReviews(storeId, cursor, size);
+
+        // 4. 성공 응답 반환 (200 OK)
+        res.status(StatusCodes.OK).json({
+            success: true,
+            code: "S200",
+            message: "리뷰 목록 조회 성공 (페이지네이션 적용됨)",
+            data: {
+                store_id: storeId,
+                reviews: reviews, // 현재 페이지의 리뷰 목록
+                cursor: nextCursor, // 다음 페이지를 위한 커서 값 (null이면 마지막 페이지)
+            },
+        });
+    } catch (error) {
         next(error);
     }
 };

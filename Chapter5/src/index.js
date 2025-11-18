@@ -1,33 +1,27 @@
-// src/index.js (최종 수정)
-
+// src/index.js
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from 'url';
-import { pool } from "./db.config.js";
 
-// 정적 임포트: 라우터 변수를 임포트와 동시에 선언합니다.
-// store.route.final.js 파일을 사용하고 있다고 가정합니다.
+import { prisma } from "./db.config.js";
 import usersRouter from "./routes/users.route.js";
-import storesRouter from "./store.route.final.js"; 
+import storesRouter from "./store.route.final.js";
 import missionsRouter from "./routes/mission.route.js";
+import { handleListStoreReviews } from "./controllers/store.controller.js";
 
-// 1. 현재 파일의 디렉토리(__dirname)를 ES Module 환경에 맞게 정의
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// index.js에서도 dotenv.config()를 호출하여
+// 혹시 db.config.js보다 먼저 환경 변수가 필요한 부분이 있는지 대비합니다.
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000; // PORT를 환경변수에서 가져오지 못하면 3000 사용
+// 환경 변수에서 PORT를 가져옵니다.
+const port = process.env.PORT || 3000;
 
-// DB 연결 테스트 함수: 서버 시작 전에 연결 확인
+// Prisma를 이용한 DB 연결 테스트 함수로 대체
 async function testConnection() {
     try {
-        const connection = await pool.getConnection();
-        console.log("Database connection successful!");
-        connection.release(); // 연결 해제
+        await prisma.$connect(); // Prisma를 통해 DB 연결을 시도합니다.
+        console.log("Database connection successful using Prisma!");
         return true;
     } catch (error) {
         console.error("Database connection failed:", error.message);
@@ -54,6 +48,8 @@ async function initializeApp() {
         app.get("/", (req, res) => {
             res.send("Hello World!");
         });
+
+        app.get("/api/v1/stores/:storeId/reviews", handleListStoreReviews);
 
         // 모든 라우터 app.use로 연결
         app.use("/api/v1/users", usersRouter); 

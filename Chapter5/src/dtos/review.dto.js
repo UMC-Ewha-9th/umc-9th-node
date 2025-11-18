@@ -18,3 +18,18 @@ export const bodyToReview = (body, storeId, userId) => {
         content: body.content, 
     };
 };
+
+/**
+ * Repository에서 받아온 리뷰 목록을 클라이언트에게 반환할 응답 형식으로 변환합니다.
+ * @param {Array<object>} reviews - Repository로부터 받은 리뷰 객체 배열 (user.name 포함)
+ * @returns {Array<object>} 클라이언트에게 전달할 최종 리뷰 응답 DTO 배열
+ */
+export const responseFromReviews = (reviews) => {
+    return reviews.map(review => ({
+        review_id: review.id,
+        user_name: review.user.name, // 사용자 이름 포함
+        rating: review.rating,
+        content: review.content,
+        created_at: review.createdAt,
+    }));
+};
