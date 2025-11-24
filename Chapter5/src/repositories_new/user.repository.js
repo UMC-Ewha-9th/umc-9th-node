@@ -1,6 +1,45 @@
 import { prisma } from "../db.config.js";
 
 /**
+ * 사용자 ID를 기준으로 작성한 리뷰 목록을 조회합니다. (findReviewsByUserId)
+ * @param {bigint} userId - 사용자 ID
+ * @returns {array} 리뷰 목록 배열 (Review 배열)
+ */
+export const findReviewsByUserId = async (userId) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: {
+        userId: userId,
+      },
+      // 리뷰와 관련된 User, Store 정보를 함께 가져옵니다.
+      include: {
+        user: { // User 모델 포함 (자신의 닉네임)
+          select: {
+            name: true,
+          }
+        },
+        store: { // Store 모델 포함 (가게 이름)
+          select: {
+            name: true,
+          }
+        },
+        // TODO: ReviewReply 모델이 추가되면 여기에 include를 추가하여 답글을 가져옵니다.
+      },
+      // 최신 리뷰가 먼저 오도록 내림차순 정렬
+      orderBy: {
+        createdAt: 'desc',
+      }
+    });
+
+    return reviews;
+
+  } catch (error) {
+    console.error("Error getting user reviews with Prisma:", error);
+    throw new Error(`내가 작성한 리뷰 조회 중 데이터베이스 오류: ${error.message}`);
+  }
+};
+
+/**
  * 새 사용자를 데이터베이스에 삽입합니다. (기존 addUser 함수)
  * 삽입 전, 이메일 중복을 확인합니다.
  * @param {object} data - 사용자 데이터 객체 (email, name, gender, password 등)
@@ -140,3 +179,4 @@ export const getUserPreferencesByUserId = async (userId) => {
     throw new Error(`선호 카테고리 조회 중 데이터베이스 오류: ${error.message}`);
   }
 };
+

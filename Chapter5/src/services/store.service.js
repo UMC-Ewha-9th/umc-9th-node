@@ -1,6 +1,7 @@
-import { addStore, getStoreById, addReview, addMission, getAllStoreReviews } from "../repositories_new/store.repository.js";
+import { addStore, getStoreById, addReview, addMission, getAllStoreReviews, getStoreMissions } from "../repositories_new/store.repository.js";
 import { checkMissionChallenge, insertMissionAttempt } from "../repositories_new/mission.repository.js";
 import { responseFromReviews } from "../dtos/review.dto.js"
+import { responseFromMissions } from "../dtos/mission.dto.js";
 
 // 가게 등록 비즈니스 로직
 export const storeRegister = async (data) => {
@@ -105,4 +106,24 @@ export const listStoreReviews = async (storeId) => {
 
     // 3. 응답 DTO 변환 및 반환
     return responseFromReviews(reviews);
+};
+
+/**
+ * 특정 가게의 활성화된 미션 목록을 조회하는 비즈니스 로직
+ * @param {bigint} storeId - 미션 목록을 조회할 가게 ID
+ * @returns {Array<object>} - 포맷된 미션 응답 DTO 배열
+ */
+export const listStoreMissions = async (storeId) => {
+    // 1. [핵심 검증] 가게 존재 여부 확인
+    const store = await getStoreById(storeId);
+    if (!store) {
+        // M404: Not Found - 가게가 없으면 미션도 조회 불가
+        throw new Error("M404: 해당 가게를 찾을 수 없습니다."); 
+    }
+    
+    // 2. Repository 호출: 활성화된 미션 목록 조회
+    const missions = await getStoreMissions(storeId);
+
+    // 3. 응답 DTO 변환 및 반환
+    return responseFromMissions(missions);
 };

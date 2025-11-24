@@ -149,14 +149,14 @@ model Mission {
   // store_id: bigint not null
   storeId          BigInt    @map("store_id")
 
+  // 미션 만료일 추가 (null 허용, 이벤트성 미션/상시 미션 지원)
+  endDate           DateTime? @map("end_date") @db.DateTime
+
   // min_amount: decimal(10, 2) not null
   minAmount        Decimal   @map("min_amount") @db.Decimal(10, 2) // 정밀한 계산을 위해 Decimal 사용
 
   // reward_point: int default 0 not null
   rewardPoint      Int       @map("reward_point") @default(0) @db.Int
-
-  // description: text not null
-  description      String    @db.Text // TEXT 타입은 Prisma에서 String으로 매핑, @db.Text 지정
 
   // is_active: tinyint(1) default 1 null
   isActive         Boolean?  @map("is_active") @default(true) @db.TinyInt // tinyint(1)을 Boolean으로 매핑

@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import { bodyToStore } from "../dtos/store.dto.js";
 import { bodyToReview } from "../dtos/review.dto.js";
 import { bodyToMission } from "../dtos/mission.dto.js";
-import { storeRegister, registerReview, registerMission, challengeMission, listStoreReviews } from "../services/store.service.js";
+import { storeRegister, registerReview, registerMission, challengeMission, listStoreReviews, listStoreMissions } from "../services/store.service.js";
 
 export const handleStoreRegister = async (req, res, next) => {
   try {
@@ -172,6 +172,33 @@ export const handleListStoreReviews = async (req, res, next) => {
                 cursor: nextCursor, // 다음 페이지를 위한 커서 값 (null이면 마지막 페이지)
             },
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * 특정 가게의 미션 목록 조회 핸들러 (GET /api/v1/stores/:storeId/missions)
+ */
+export const handleListStoreMissions = async (req, res, next) => {
+    try {
+        // 1. Path Variable에서 storeId 추출 및 BigInt 변환
+        const storeId = BigInt(req.params.storeId); 
+
+        // 2. Service 로직 호출
+        const missions = await listStoreMissions(storeId);
+
+        // 3. 성공 응답 반환 (200 OK)
+        res.status(StatusCodes.OK).json({
+            success: true,
+            code: "M200",
+            message: "가게 미션 목록 조회 성공",
+            data: {
+                store_id: storeId.toString(),
+                missions: missions,
+            },
+        });
+
     } catch (error) {
         next(error);
     }

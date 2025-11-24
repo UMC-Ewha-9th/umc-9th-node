@@ -13,6 +13,11 @@ import { handleListStoreReviews } from "./controllers/store.controller.js";
 // 혹시 db.config.js보다 먼저 환경 변수가 필요한 부분이 있는지 대비합니다.
 dotenv.config();
 
+// BigInt 직렬화 문제 해결 코드
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
+
 const app = express();
 // 환경 변수에서 PORT를 가져옵니다.
 const port = process.env.PORT || 3000;

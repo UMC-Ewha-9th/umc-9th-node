@@ -1,6 +1,44 @@
 import { prisma } from "../db.config.js";
 
 /**
+ * 특정 가게의 활성화된 미션 목록을 조회합니다. (getStoreMissions)
+ * @param {bigint} storeId - 가게 ID
+ * @returns {Array<object>} - 활성화된 미션 객체 배열
+ */
+export const getStoreMissions = async (storeId) => {
+    try {
+        const missions = await prisma.mission.findMany({
+            where: {
+                storeId: storeId,
+                isActive: true, // 활성화된 미션만 조회
+            },
+            // 미션과 관련된 Store, Category 정보를 함께 가져옵니다.
+            include: {
+                store: {
+                    select: {
+                        name: true, // 가게 이름
+                        category: { // 중첩 include: Store를 통해 Category 정보를 가져옴
+                            select: {
+                                name: true, // 카테고리 이름
+                            }
+                        }
+                    }
+                },
+            },
+            orderBy: {
+                createdAt: 'desc', // 최신 미션이 먼저 오도록 정렬
+            }
+        });
+
+        return missions;
+
+    } catch (error) {
+        console.error("[Prisma Error - getStoreMissions]:", error);
+        throw new Error(`[DB Error - getStoreMissions]: ${error.message}`);
+    }
+};
+
+/**
  * 새 가게를 데이터베이스에 삽입합니다. (addStore)
  * @param {object} data - 가게 데이터 객체 (regionId, name, address, phoneNumber, categoryId)
  * @returns {number} 생성된 가게의 ID
@@ -102,9 +140,9 @@ export const addMission = async (data) => {
         const createdMission = await prisma.mission.create({
             data: {
                 storeId: data.storeId, // Store.id 참조
+                endDate: data.endDate,
                 minAmount: data.minAmount,
                 rewardPoint: data.rewardPoint,
-                description: data.description,
             },
             select: {
                 id: true
