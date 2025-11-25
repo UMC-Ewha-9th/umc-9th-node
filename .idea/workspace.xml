@@ -10,9 +10,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="34lWON82UxYEEAwudOwMHU6FUgk" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,7 +22,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "feature/chapter-08",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/yeonwookim/25fall_umc",
     "nodejs_package_manager_path": "npm",
@@ -38,7 +38,11 @@
       <option name="presentableId" value="Default" />
       <updated>1761788606918</updated>
       <workItem from="1761788608304" duration="4000" />
+      <workItem from="1763972696871" duration="9000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>

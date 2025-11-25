@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";       //.env파일로부터 환경 변수를 읽어들임. 
 import express from "express";        // -> ES Module
 import cookieParser from "cookie-parser"; // 쿠키를 해석 
+import swaggerAutogen from "swagger-autogen";
+import swaggerUiExpress from "swagger-ui-express";
 import { handleUserSignUp, handleListUserReviews, handleListUserMissions } from "./controllers/user.controller.js";
 import { handleAddStore, handleListStoreReviews, handleListStoreMissions } from "./controllers/store.controller.js";
 import { handleAddReview } from "./controllers/review.controller.js";
@@ -46,6 +48,37 @@ app.use((req, res, next) => {
   };
 
   next();
+});
+
+app.use(
+  "/docs",
+  swaggerUiExpress.serve,
+  swaggerUiExpress.setup({}, {
+    swaggerOptions: {
+      url: "/openapi.json",
+    },
+  })
+);
+
+app.get("/openapi.json", async (req, res, next) => {
+  // #swagger.ignore = true
+  const options = {
+    openapi: "3.0.0",
+    disableLogs: true,
+    writeOutputFile: false,
+  };
+  const outputFile = "/dev/null"; // 파일 출력은 사용하지 않습니다.
+  const routes = ["./src/index.js"];
+  const doc = {
+    info: {
+      title: "UMC 9th",
+      description: "UMC 9th Node.js 테스트 프로젝트입니다.",
+    },
+    host: "localhost:3000",
+  };
+
+  const result = await swaggerAutogen(options)(outputFile, routes, doc);
+  res.json(result ? result.data : null);
 });
 
 // 라우트들
