@@ -75,6 +75,12 @@ export const addUser = async (data) => {
     return createdUser.id;
     
   } catch (error) {
+    // 1. Prisma 에러 코드 P2002(유니크 제약조건 위반) 확인
+    if (error.code === 'P2002') {
+      return null; // 서비스 계층으로 null을 리턴하여 DuplicateUserEmailError 발생 유도
+    }
+
+    // 2. 그 외 에러는 기존처럼 처리
     console.error("Error creating user with Prisma:", error);
     throw new Error(`사용자 생성 중 데이터베이스 오류: ${error.message}`);
   }

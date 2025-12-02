@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import { getActiveMissionAttemptsByUserId, getAttemptDetailsForCompletion, completeMissionTransaction } from "../repositories_new/mission.repository.js";
 import { responseFromActiveMissionAttempts } from "../dtos/mission.dto.js";
 import { Decimal } from "@prisma/client/runtime/library.js";
+import { DuplicateUserEmailError } from "../errors.js";
 
 import {
   addUser,
@@ -49,7 +50,7 @@ export const userSignUp = async (data) => {
   });
 
   if (joinUserId === null) {
-    throw new Error("이미 존재하는 이메일입니다.");
+    throw new DuplicateUserEmailError("이미 존재하는 이메일입니다.", data);
   }
 
   for (const preference of data.preferences) {

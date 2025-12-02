@@ -5,11 +5,21 @@ import { bodyToUser } from "../dtos/user.dto.js";
 import { userSignUp, listMyReviews, listActiveMissions, processMissionCompletion } from "../services/user.service.js";
 
 export const handleUserSignUp = async (req, res, next) => {
-  console.log("회원가입을 요청했습니다!");
-  console.log("body:", req.body); // 값이 잘 들어오나 확인하기 위한 테스트용
+    try {
+        console.log("회원가입을 요청했습니다!");
+        console.log("body:", req.body); // 값이 잘 들어오나 확인하기 위한 테스트용
 
-  const user = await userSignUp(bodyToUser(req.body));
-  res.status(StatusCodes.OK).json({ result: user });
+        const user = await userSignUp(bodyToUser(req.body));
+        
+        // res.success 호출 (헬퍼 함수 사용)
+        res.success({ 
+            code: "201", 
+            message: "회원가입 성공", 
+            result: user 
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 /**
@@ -28,9 +38,9 @@ export const handleListMyReviews = async (req, res, next) => {
         // 2. Service 로직 호출
         const reviews = await listMyReviews(userId);
 
-        // 3. 성공 응답 반환 (200 OK)
-        res.status(StatusCodes.OK).json({
-            success: true,
+        // 3. 성공 응답 반환 (res.success 사용)
+        // success: true는 헬퍼가 처리하므로 생략하고, data와 code, message만 전달합니다.
+        res.success({
             code: "U200",
             message: "내가 작성한 리뷰 목록 조회 성공",
             data: {
@@ -56,9 +66,8 @@ export const handleListActiveMissions = async (req, res, next) => {
         // 2. Service 로직 호출
         const missions = await listActiveMissions(userId);
 
-        // 3. 성공 응답 반환 (200 OK)
-        res.status(StatusCodes.OK).json({
-            success: true,
+        // 3. 성공 응답 반환
+        res.success({
             code: "M200",
             message: "진행 중인 미션 목록 조회 성공",
             data: {
@@ -86,15 +95,15 @@ export const handleMissionCompletion = async (req, res, next) => {
         const spentAmount = req.body.spentAmount;
 
         if (!spentAmount || spentAmount <= 0) {
+            // 에러 발생 시 next(err)로 던지면 전역 에러 핸들러(res.error)가 처리합니다.
             throw new Error("B400: 유효한 결제 금액(spentAmount)을 입력해야 합니다.");
         }
 
         // Service 로직 호출
         const result = await processMissionCompletion(userId, attemptId, spentAmount);
 
-        // 3. 성공 응답 반환 (200 OK)
-        res.status(StatusCodes.OK).json({
-            success: true,
+        // 3. 성공 응답 반환
+        res.success({
             code: result.isSuccess ? "M200_C" : "M200_F",
             message: result.isSuccess ? "미션 성공 및 포인트 적립 완료" : "미션 실패 처리 완료",
             data: {

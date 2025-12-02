@@ -8,7 +8,7 @@ export const bodyToUser = (body) => {
     email: body.email, //필수 
     name: body.name, // 필수
     gender: body.gender, // 필수
-    birth: body.birth, // 필수 (DB에 Date/Datetime으로 저장)
+    birth: new Date(body.birth), // 필수 (DB에 Date/Datetime으로 저장)
     address: body.address || null, // 선택, 빈 문자열보다 null이 DB에 더 명확
     detailAddress: body.detailAddress || null, // 선택
     phoneNumber: body.phoneNumber, // 필수
